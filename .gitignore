@@ -6,6 +6,9 @@
 deps/
 states/
 
+cache/
+out/
+
 # Debug info
 *.dbg.json
 *.tsbuildinfo
