@@ -13,18 +13,15 @@ contract SuccessTokenBankWithCallback {
     
     // 存储每个用户的存款余额
     mapping(address => uint256) public deposits;
+
+
     
     // 事件
     event Deposited(address indexed user, uint256 amount);
     event Withdrawn(address indexed user, uint256 amount);
     event AutoDeposited(address indexed from, uint256 amount, bytes data);
     
-    modifier nonReentrant() {
-        require(!_locked, "ReentrancyGuard: reentrant call");
-        _locked = true;
-        _;
-        _locked = false;
-    }
+
 
     // 回调函数的选择器
     bytes4 private constant _TRANSFER_RECEIVED = bytes4(
@@ -33,6 +30,13 @@ contract SuccessTokenBankWithCallback {
     
     constructor(address _tokenAddress) {
         successToken = SuccessTokenWithCallback(_tokenAddress);
+    }
+    
+    modifier nonReentrant() {
+        require(!_locked, "ReentrancyGuard: reentrant call");
+        _locked = true;
+        _;
+        _locked = false;
     }
     
     /**

@@ -106,7 +106,11 @@ contract SuccessTokenWithCallback is ERC20, Ownable {
      * @dev 检查地址是否为合约
      */
     function isContract(address account) internal view returns (bool) {
-        return to.code.length > 0;
+        uint256 size;
+        assembly {
+            size := extcodesize(account)
+        }
+        return size > 0;
     }
     
     function mint(address to, uint256 amount) public onlyOwner {
