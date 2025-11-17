@@ -22,12 +22,8 @@ contract DeployCommunityNFT is Script {
         vm.stopBroadcast();
         
         console.log("CommunityNFT deployed to:", address(nft));
-        
-        // 保存部署地址到文件，便于后续使用
-        vm.writeJson(
-            vm.toString(address(nft)), 
-            "./deployment.json"
-        );
+        //https://sepolia.etherscan.io/address/0x935e267486cfe4ed8f2c37f7ccdeeeada1d71b8a
+    
     }
 }
 

@@ -10,6 +10,11 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  */
 contract SuccessTokenWithCallback is ERC20, Ownable {
 
+    // 回调函数的选择器
+    bytes4 private constant _TRANSFER_RECEIVED = bytes4(
+        keccak256("onTransferReceived(address,address,uint256,bytes)")
+    );
+
     // 转账回调事件
     event TransferWithCallback(address indexed from, address indexed to, uint256 value, bytes data);
     
@@ -85,7 +90,7 @@ contract SuccessTokenWithCallback is ERC20, Ownable {
         // 尝试调用接收方合约的 onTransferReceived 函数
         (bool success, bytes memory returnData) = to.call(
             abi.encodeWithSelector(
-                bytes4(keccak256("onTransferReceived(address,address,uint256,bytes)")),
+                _TRANSFER_RECEIVED,
                 msg.sender, // 操作者（可能是from，也可能是授权的spender）
                 from,       // 发送者
                 amount,     // 金额
@@ -96,7 +101,7 @@ contract SuccessTokenWithCallback is ERC20, Ownable {
         // 检查调用是否成功并且返回了正确的selector
         if (success && returnData.length > 0) {
             bytes4 returnValue = abi.decode(returnData, (bytes4));
-            return returnValue == bytes4(keccak256("onTransferReceived(address,address,uint256,bytes)"));
+            return returnValue == _TRANSFER_RECEIVED;
         }
         
         return false;
@@ -120,4 +125,5 @@ contract SuccessTokenWithCallback is ERC20, Ownable {
     function burn(uint256 amount) public {
         _burn(msg.sender, amount);
     }
+
 }

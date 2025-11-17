@@ -137,4 +137,5 @@ contract SuccessTokenBankWithCallback {
     function getTokenBalance(address user) external view returns (uint256) {
         return successToken.balanceOf(user);
     }
+
 }
