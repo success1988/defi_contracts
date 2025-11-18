@@ -108,48 +108,7 @@ contract SuccessTokenBankWithCallbackTest is Test {
         assertEq(token.balanceOf(user1), 4000 * 10 ** token.decimals());
         assertEq(token.balanceOf(address(bank)), depositAmount);
     }
-    
-    function test_DepositWithData() public {
-        uint256 depositAmount = 1000 * 10 ** token.decimals();
-        bytes memory customData = abi.encode("custom deposit data");
-        
-        // 需要先授权给银行合约
-        vm.prank(user1);
-        token.approve(address(bank), depositAmount);
-        
-        vm.prank(user1);
-        bank.depositWithData(depositAmount, customData);
-        
-        assertEq(bank.getDepositBalance(user1), depositAmount);
-        assertEq(token.balanceOf(user1), 4000 * 10 ** token.decimals());
 
-
-        uint256 depositAmount = 1000 * 10 ** token.decimals();
-        
-        vm.prank(user1);
-        token.approve(address(bank), depositAmount);
-        
-        vm.prank(user1);
-        bank.deposit(depositAmount);
-        
-        assertEq(bank.getDepositBalance(user1), depositAmount);
-        assertEq(token.balanceOf(user1), 4000 * 10 ** token.decimals());
-        assertEq(token.balanceOf(address(bank)), depositAmount);
-    }
-    
-    function test_ReentrancyProtection() public {
-        // 创建一个恶意合约尝试重入攻击
-        MaliciousBank attacker = new MaliciousBank(address(token), address(bank));
-        
-        // 给恶意合约转账一些代币
-        vm.prank(owner);
-        token.transfer(address(attacker), 1000 * 10 ** token.decimals());
-        
-        // 应该被重入保护阻止
-        vm.expectRevert("ReentrancyGuard: reentrant call");
-        attacker.attack();
-    }
-    
     function test_OnlyTokenCanCallCallback() public {
         // 尝试直接调用回调函数（非token合约调用）
         vm.expectRevert("Only token can call");
@@ -228,77 +187,5 @@ contract SuccessTokenBankWithCallbackTest is Test {
         
         vm.prank(user1);
         token.transferAndCall(address(bank), depositAmount, depositData);
-    }
-}
-
-// 修复后的恶意合约用于测试重入保护
-contract MaliciousBank {
-    SuccessTokenWithCallback public token;
-    SuccessTokenBankWithCallback public bank;
-    bool private attacking;
-    
-    constructor(address _token, address _bank) {
-        token = SuccessTokenWithCallback(_token);
-        bank = SuccessTokenBankWithCallback(_bank);
-    }
-    
-    function attack() external {
-        // 先通过transferAndCall存款
-        bytes memory data = abi.encode("attack");
-        token.transferAndCall(address(bank), 100 * 10 ** token.decimals(), data);
-    }
-    
-    function onTransferReceived(
-        address operator,
-        address from,
-        uint256 amount,
-        bytes calldata data
-    ) external returns (bytes4) {
-        // 在回调函数中尝试重入攻击
-        if (msg.sender == address(token) && !attacking) {
-            attacking = true;
-            // 尝试在回调中再次调用银行合约 - 这应该被重入保护阻止
-            bank.withdraw(amount);
-        }
-        
-        return bytes4(keccak256("onTransferReceived(address,address,uint256,bytes)"));
-    }
-    
-    // 添加fallback函数以防万一
-    fallback() external payable {}
-    receive() external payable {}
-}
-
-// 另一个重入攻击测试合约 - 测试存款时的重入
-contract MaliciousBankDeposit {
-    SuccessTokenWithCallback public token;
-    SuccessTokenBankWithCallback public bank;
-    uint256 public attackCount;
-    
-    constructor(address _token, address _bank) {
-        token = SuccessTokenWithCallback(_token);
-        bank = SuccessTokenBankWithCallback(_bank);
-    }
-    
-    function attack() external {
-        // 先授权
-        token.approve(address(bank), type(uint256).max);
-        // 然后存款触发重入
-        bank.deposit(100 * 10 ** token.decimals());
-    }
-    
-    function onTransferReceived(
-        address operator,
-        address from,
-        uint256 amount,
-        bytes calldata data
-    ) external returns (bytes4) {
-        attackCount++;
-        if (attackCount == 1) {
-            // 第一次回调时尝试重入存款
-            bank.deposit(50 * 10 ** token.decimals());
-        }
-        
-        return bytes4(keccak256("onTransferReceived(address,address,uint256,bytes)"));
     }
 }

@@ -12,7 +12,7 @@ contract DeploySSTScript is Script {
         
         vm.startBroadcast(deployerPrivateKey);
         
-        // 部署代币合约
+        // 部署代币合约 https://sepolia.etherscan.io/address/0x80317e662c0799b5f5656f5207f883fb1d75ccc9
         uint256 initialSupply = 1000000; // 100万代币
         SuccessTokenWithCallback token = new SuccessTokenWithCallback(initialSupply);
         
@@ -20,7 +20,7 @@ contract DeploySSTScript is Script {
         console.log("Initial supply:", initialSupply * 10 ** token.decimals());
         console.log("Deployer token balance:", token.balanceOf(deployer));
         
-        // 部署银行合约
+        // 部署银行合约 https://sepolia.etherscan.io/address/0x9612b0e2bab8e22d0c0fd670ef584a95128da8eb
         SuccessTokenBankWithCallback bank = new SuccessTokenBankWithCallback(address(token));
         
         console.log("SuccessTokenBankWithCallback deployed at:", address(bank));
@@ -61,7 +61,7 @@ contract DeploySSTWithTestData is Script {
         console.log("Token:", address(token));
         console.log("Bank:", address(bank));
         for (uint i = 0; i < testUsers.length; i++) {
-            console.log("Test user", i, ":", testUsers[i], "- Balance:", token.balanceOf(testUsers[i]));
+            console.log("Test user %s: %s - Balance: %s", i, testUsers[i], token.balanceOf(testUsers[i]));
         }
     }
 }

@@ -72,7 +72,7 @@ contract SuccessTokenBankWithCallback {
     /**
      * @dev 传统存款函数（仍然支持）
      */
-    function deposit(uint256 amount) external {
+    function deposit(uint256 amount) external nonReentrant{
         require(amount > 0, "Amount must be greater than 0");
         require(
             successToken.balanceOf(msg.sender) >= amount,
@@ -92,7 +92,7 @@ contract SuccessTokenBankWithCallback {
     /**
      * @dev 取款函数
      */
-    function withdraw(uint256 amount) external {
+    function withdraw(uint256 amount) external nonReentrant{
         require(amount > 0, "Amount must be greater than 0");
         require(deposits[msg.sender] >= amount, "Insufficient deposit balance");
         
@@ -106,24 +106,6 @@ contract SuccessTokenBankWithCallback {
         emit Withdrawn(msg.sender, amount);
     }
     
-    /**
-     * @dev 带数据的存款函数（手动触发回调）
-     */
-    function depositWithData(uint256 amount, bytes calldata data) external {
-        require(amount > 0, "Amount must be greater than 0");
-        require(
-            successToken.balanceOf(msg.sender) >= amount,
-            "Insufficient token balance"
-        );
-        
-        // 使用transferAndCall进行存款
-        require(
-            successToken.transferAndCall(address(this), amount, data),
-            "Transfer with callback failed"
-        );
-        
-        // 注意：存款余额在回调函数中已经更新，这里不需要重复更新
-    }
     
     // 视图函数
     function getDepositBalance(address user) external view returns (uint256) {
