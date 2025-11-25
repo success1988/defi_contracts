@@ -3,6 +3,9 @@ src = "src"
 out = "out"
 libs = ["lib"]
 solc = "0.8.20"
+fs_permissions = [
+    { access = "write", path = "./deployments" }
+]
 
 # 测试配置
 [fuzz]
@@ -19,6 +22,7 @@ depth = 15
 # 网络配置
 [rpc_endpoints]
 sepolia = "${SEPOLIA_RPC_URL}"
+local = "${LOCAL_URL}"
 mainnet = "https://mainnet.infura.io/v3/ab65659768724710a5009895c32ed59e"
 
 # Etherscan配置

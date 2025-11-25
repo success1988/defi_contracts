@@ -7,6 +7,7 @@ import "./CommunityNFT.sol";
 
 contract NFTMarket{
 
+    bool private _locked;
     //FT合约
     SuccessTokenWithCallback public successToken;
     //NFT合约
@@ -101,7 +102,7 @@ contract NFTMarket{
         //当前合约将该NFT转移给买家
         communityNFT.safeTransferFrom(holder, msg.sender, tokenId);
         //将当前NFT下架
-        delete prices[tokenId]；
+        delete prices[tokenId];
 
         //触发卖出事件
         emit NFTSold(msg.sender, holder, tokenId, nftPrice);
@@ -131,12 +132,12 @@ contract NFTMarket{
         if(approvedAddr != address(this)){
             revert NotApproved(tokenId);
         }
-        
+
         address holder = communityNFT.ownerOf(tokenId);
         //当前合约将该NFT转移给买家
         communityNFT.safeTransferFrom(holder, from, tokenId);
         //将当前NFT下架
-        delete prices[tokenId]；
+        delete prices[tokenId];
 
         //触发卖出事件
         emit NFTSold(from, holder, tokenId, nftPrice);

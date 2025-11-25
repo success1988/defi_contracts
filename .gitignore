@@ -8,6 +8,8 @@ states/
 
 cache/
 out/
+deployments/
+broadcast/
 
 # Debug info
 *.dbg.json
