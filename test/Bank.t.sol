@@ -65,7 +65,8 @@ contract BankTest is Test {
     
     function test_RevertWhen_EmergencyWithdrawNotOwner() public {
         vm.prank(user1);
-        vm.expectRevert("Only owner can call this function");
+        bytes memory data = abi.encodeWithSignature("NotOwner(address)", user1);
+        vm.expectRevert(data);
         bank.emergencyWithdraw();
     }
     

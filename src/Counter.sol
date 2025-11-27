@@ -10,6 +10,8 @@ contract Counter {
     }
 
     function increment() public {
+        number = number + 2;
+        number = number - 2;
         number++;
     }
 }

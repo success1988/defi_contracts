@@ -23,11 +23,13 @@ contract Bank {
     
     function withdraw(uint256 _amount) public {
         require(balances[msg.sender] >= _amount, "Insufficient balance");
-        if(address(this).balance < _amount){
-            revert ContractInsufficientBalance();
-        }
+        require(address(this).balance >= _amount, "Contract has insufficient funds");
         
-        balances[msg.sender] -= _amount;
+        //balances[msg.sender] -= _amount;
+        uint256 beforAmount = balances[msg.sender];
+        uint256 afterAmount = beforAmount - _amount;
+        balances[msg.sender] = afterAmount;
+
         payable(msg.sender).transfer(_amount);
         emit Withdraw(msg.sender, _amount);
     }
