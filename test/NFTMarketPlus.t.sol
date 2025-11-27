@@ -57,7 +57,8 @@ contract NFTMarketPlusTest is Test {
 
         nft.mint(alice, 1);
         nft.mint(alice, 2);
-        usd.transfer(bob, 10_000 * 10 ** 18);
+        //usd.transfer(bob, 10_000 * 10 ** 18);
+        deal(address(usd), bob, 10_000 * 10 ** 18);
     }
 
     function invokeList() internal{
